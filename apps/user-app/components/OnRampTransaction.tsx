@@ -19,14 +19,15 @@ export const OnRampTransaction=({transactions}:{
 
     }
     return <Card title="Recent transactions">
-            <div className="pt-8">
-               {transactions.map((t)=> <div className="flex justify-between">
-                <div className="text-sm"> 
+            <div className="pt-8 space-y-3">
+               {transactions.map((t)=> <div key={Math.random()} className="grid grid-cols-4 gap-4 text-sm">
+                <div className="text-sm "> 
                     Received INR
                 </div>
                 <div className="text-slate-600 text-sm">
                     {t.Time.toDateString()}
                 </div>
+                <div className="text-sm">{t.status}</div>
                 <div className="flex flex-col justify-center">
                     +RS {Number(t.amount)/100}
                 </div>
