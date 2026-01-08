@@ -3,6 +3,7 @@ import {prisma} from "@repo/db"
 import bcrypt from "bcrypt"
  import type { Session } from "next-auth";
  import type { JWT } from "next-auth/jwt";
+import { signIn } from "next-auth/react";
 
 export const authOptions={
      providers:[
@@ -68,5 +69,8 @@ export const authOptions={
 
             return session
         }
+    },
+    pages:{
+        signIn:"/signIn"
     }
 }

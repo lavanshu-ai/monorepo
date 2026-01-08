@@ -24,7 +24,7 @@ export const AddMoney=  ()=>{
    const [provider,setProvider]=useState(SUPPORTED_BANKS[0]?.name||"");
 
     return(<div>
-        <Card title="AddMoney" >
+        <Card title="Add Money to wallet" >
         <div className="w-full">
         <Textinput label="Amount" placeholder="Amount" onChange={ (e)=>{ 
             setAmount(Number(e))

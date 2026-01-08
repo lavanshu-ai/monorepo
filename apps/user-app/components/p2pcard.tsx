@@ -9,9 +9,9 @@ export const P2pcard =()=>{
     const [phone,setPhone]=useState("");
 
     return <div>
-        <Card title="Peer to Peer Transfer">
+        <Card title="Send Money" >
             <div>
-            <Textinput placeholder="Number" label="Peer Phone No." onChange={(n)=>{
+            <Textinput placeholder="Number" label="Phone No." onChange={(n)=>{
                 setPhone(n)
             }}/>
             </div>
