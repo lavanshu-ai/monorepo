@@ -40,14 +40,19 @@ export const SignInCard=()=>{
         }
      
      }
-    return <Card title="SignIn">
-        <div>
-            <Textinput label="Pnone No." placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput>
-            <Textinput label="Password" placeholder="********" onChange={(p)=>{handelPasswordChange(p)}}></Textinput>
-        </div>
-        <div>
+    return <div className="flex justify-center pt-24">
+           <div className="w-full max-w-sm">
+         <Card title="SignIn"  >
+        <div className="">
+            <Textinput label="Phone Number" placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
+           <div>
+            <Textinput label="Password" placeholder="********" onChange={(p)=>{handelPasswordChange(p)}}></Textinput></div> 
+       
+        <div className="flex justify-center pt-4">
             <Button onClick={()=>handelSubmit()
             }>Signin</Button>
         </div>
-    </Card>
-}
+        
+    </Card></div>
+    </div>
+    }
