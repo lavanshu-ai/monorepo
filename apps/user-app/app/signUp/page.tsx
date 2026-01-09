@@ -1,6 +1,5 @@
 "use client"
-import { SignUpCard } from "../../components/signUpCard";
-
+import { SignUpCard } from "../../components/signUpCard"
 
 export default function signUp(){
     return <div>

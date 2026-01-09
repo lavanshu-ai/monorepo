@@ -34,25 +34,6 @@ export const authOptions={
                 }
                 return null;
             }
-
-            try {
-                const user = await prisma.user.create({
-                    data: {
-                        number: credentials.phone.toString(),
-                        password: hashedPassword,
-                        email:"lv"
-                    }
-                });
-            
-                return {
-                    id: user.id.toString(),
-                    name: user.name,
-                    email: user.number
-                }
-            } catch(e) {
-                console.error(e);
-            }
-
             return null
           },
          

@@ -44,7 +44,7 @@ export const SignInCard=()=>{
      }
     return <div className="flex justify-center pt-24 min-h-screen bg-slate-400">
            <div className="w-full max-w-sm">
-         <Card title="SignIn"  >
+         <Card title="Sign In"  >
         <div className="">
             <Textinput label="Phone no." placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
            <div>
@@ -54,8 +54,8 @@ export const SignInCard=()=>{
             <Button onClick={()=>handelSubmit()
             }>Signin</Button>
         </div>
-        <div className="text-sm text-slate-500 flex justify-center pt-6">New user? 
-            <Link className="text-slate-900 hover:text-green-600" href="/signUp"> Register</Link>
+        <div className="text-sm text-slate-500  pt-6">Don’t have an account? 
+            <Link className="text-slate-900 hover:text-green-600" href="/signUp"> Sign up</Link>
         </div>
     </Card></div>
     </div>
