@@ -42,7 +42,7 @@ export const SignInCard=()=>{
         }
      
      }
-    return <div className="flex justify-center pt-24">
+    return <div className="flex justify-center pt-24 min-h-screen bg-slate-400">
            <div className="w-full max-w-sm">
          <Card title="SignIn"  >
         <div className="">
