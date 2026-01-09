@@ -4,6 +4,8 @@ import { Button } from "@repo/ui/button";
 import { signIn } from "next-auth/react";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 export const SignInCard=()=>{
     const router =useRouter();
     const [RequiredError,setRequiredError]=useState(
@@ -53,7 +55,7 @@ export const SignInCard=()=>{
             }>Signin</Button>
         </div>
         <div className="text-sm text-slate-500 flex justify-center pt-6">New user? 
-            <a className="text-slate-900 hover:text-blue-900" href="/signUp"> Register</a>
+            <Link className="text-slate-900 hover:text-green-600" href="/signUp"> Register</Link>
         </div>
     </Card></div>
     </div>

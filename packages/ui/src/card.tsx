@@ -9,7 +9,7 @@ export function Card({
   children?: React.ReactNode;
 }): JSX.Element {
   return (
-    <a
+    <div
       className="group block border border-gray-200 rounded-lg p-6 transition-all duration-200 hover:shadow-lg hover:border-gray-300 hover:-translate-y-0.5 bg-white"
      
     >
@@ -17,6 +17,6 @@ export function Card({
         {title}
       </h1>
       <div className="text-gray-800">{children}</div>
-    </a>
+    </div>
   );
 }
