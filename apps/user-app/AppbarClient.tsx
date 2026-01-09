@@ -10,7 +10,7 @@ return(
     <div>
     <Appbar  onSignin={(signIn)} onSignout={async () =>
         {await signOut()
-            router.push("/api/auth/signin")
+            router.push("/signIn")
         }} user={session.data?.user}/>
 </div>)
 }

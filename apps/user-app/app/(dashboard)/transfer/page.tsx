@@ -4,10 +4,11 @@ import { prisma } from "@repo/db"
 import { AddMoney } from "../../../components/AddMoneycard";
 import { BalanceCard } from "../../../components/BalanceCard";
 import { OnRampTransaction } from "../../../components/OnRampTransaction";
-
+import { redirect } from "next/navigation"
 
 async function getBalance() {
     const session=await getServerSession(authOptions)
+
     const balance=await prisma.balance.findFirst({
         where:{
             userId:Number(session?.user?.id)
@@ -21,6 +22,9 @@ async function getBalance() {
 }
 async function onRampingTransactions(){
     const session=await getServerSession(authOptions)
+    if(!session){
+      redirect('/signIn')
+    }
     //console.log(session?.user.id)
     const txns=await prisma.onRamping.findMany({
         where:{
@@ -36,8 +40,8 @@ async function onRampingTransactions(){
 }
 
 export default async function(){
-    const Balance=await getBalance();
     const transactions=await onRampingTransactions();
+    const Balance=await getBalance();
     return(<div className="w-screen">
        <div className="text-4xl text-sky-800 pt-8 mb-8 font-bold">Transfer</div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4">

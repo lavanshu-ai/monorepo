@@ -44,7 +44,7 @@ export const SignInCard=()=>{
            <div className="w-full max-w-sm">
          <Card title="SignIn"  >
         <div className="">
-            <Textinput label="Phone Number" placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
+            <Textinput label="Phone no." placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
            <div>
             <Textinput label="Password" placeholder="********" onChange={(p)=>{handelPasswordChange(p)}}></Textinput></div> 
        
@@ -52,7 +52,9 @@ export const SignInCard=()=>{
             <Button onClick={()=>handelSubmit()
             }>Signin</Button>
         </div>
-        
+        <div className="text-sm text-slate-500 flex justify-center pt-6">New user? 
+            <a className="text-slate-900 hover:text-blue-900" href="/signUp"> Register</a>
+        </div>
     </Card></div>
     </div>
     }
