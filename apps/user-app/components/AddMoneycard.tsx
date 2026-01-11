@@ -5,6 +5,7 @@ import { Select } from "@repo/ui/Select";
 import { Textinput } from "@repo/ui/Textinput";
 import { useState } from "react"
 import OnRampTransaction from "../app/lib/actions/createOnRampTransaction";
+import { amountSchema } from "../app/schema/transferSchema";
 
 
 const SUPPORTED_BANKS=[{
@@ -20,14 +21,30 @@ const SUPPORTED_BANKS=[{
 
 export const AddMoney=  ()=>{
     const [redirectUrl,setRedirectUrl]=useState(SUPPORTED_BANKS[0]?.redirectUrl);
-   const [amount,setAmount]=useState(0);
+   const [amount,setAmount]=useState("");
    const [provider,setProvider]=useState(SUPPORTED_BANKS[0]?.name||"");
-
+   const [problem,setProblem]=useState("")
+   const handelAddMoney=async()=>{
+     const amt=amountSchema.safeParse({
+                amount:amount
+            })
+            if(!amt.success){
+                console.log("invalid amt")
+                amt.error.issues.forEach((issue)=>{
+                     //const field = issue.path[0] as string; single field
+                      setProblem(issue.message);
+                })
+            } 
+             else { 
+                 await OnRampTransaction(Number(amount),provider);
+                window.location.href=redirectUrl||"";
+                console.log(redirectUrl) }// print
+   }
     return(<div>
         <Card title="Add Money to wallet" >
         <div className="w-full">
-        <Textinput label="Amount" placeholder="Amount" onChange={ (e)=>{ 
-            setAmount(Number(e))
+        <Textinput label="Amount" placeholder="Amount" error={problem} onChange={ (e)=>{         
+            setAmount((e))
         }}/>
         <div className="py-4 text-left">Bank</div>
         <Select onSelect={(input)=>{ 
@@ -41,10 +58,9 @@ export const AddMoney=  ()=>{
             })
         )}/>
         <div className="flex justify-center pt-4">
-            <Button onClick={ async ()=>{  
-                await OnRampTransaction(amount,provider);
-                window.location.href=redirectUrl||"";
-                console.log(redirectUrl) // print
+            <Button onClick={ async ()=>{
+               await handelAddMoney()
+               
              }}>Add Money</Button>
         </div>
         </div>

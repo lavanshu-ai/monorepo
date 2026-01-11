@@ -34,7 +34,7 @@ app.post("/hdfcWebhook",async (req,res)=>{
             },
             data:{
                 amount:{
-                    increment:Number(paymentInfo.amount)
+                    increment:Number(paymentInfo.amount)*100
                 }
             }
           }),

@@ -5,10 +5,11 @@ import { signIn } from "next-auth/react";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { PhoneSchema } from "../app/schema/userSchema";
 
 export const SignInCard=()=>{
     const router =useRouter();
-    const [RequiredError,setRequiredError]=useState(
+    let [RequiredError,setRequiredError]=useState(
         {
             phoneReq:false,
             passReq:false
@@ -17,8 +18,18 @@ export const SignInCard=()=>{
     const phone=useRef("")
     const password=useRef("")
     const handelPhoneChange = (e: string)=>{
-        phone.current=e
-        // const phoneNumberRegex = /^[0-9]{10}$/; will be added 
+        const phoneCheck=PhoneSchema.safeParse({
+            phone:e
+        })
+        if(!phoneCheck.success) {
+            console.log("phone req fail")
+        //    setRequiredError({
+        //     passReq:false,
+        //     phoneReq:true
+        //    })
+        }else{
+                phone.current=e;
+           }
       }
     const handelPasswordChange=(p: string)=>{
         password.current=p
@@ -30,7 +41,7 @@ export const SignInCard=()=>{
         phoneReq: phone.current ? false : true,
         passReq: password.current ? false : true,
        });
-         return ;
+         return ; //########
          }
         const res=await signIn('credentials',{
             phone:phone.current,

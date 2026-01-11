@@ -2,17 +2,13 @@ import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
 import { Textinput } from "@repo/ui/Textinput";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import CreateUser from "../app/lib/actions/createUser";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-// interface newUser{
-//         name:string
-//         email:string,
-//         phone:string,
-//         password:string
-// }
+import { PhoneSchema,EmailSchema,NameSchema,PasswordSchema } from "../app/schema/userSchema";
+
 export function SignUpCard(){
     const router=useRouter();
     const number=useRef("")
@@ -20,26 +16,75 @@ export function SignUpCard(){
     const password=useRef("")
     const email=useRef("")
     const otp=useRef("")
-    // const client=useRef({
-    //     name:'',
-    //     email:'',
-    //     password:'',
-    //     number:'',
-    // })
+     let [RequiredError,setRequiredError]=useState(
+            {   nameReq:false,
+                phoneReq:false,
+                passReq:false,
+                emailReq:false
+
+            }
+        )
     const handelPasswordChange=(e:string)=>{
-        password.current=e;
+       const eCheck=PasswordSchema.safeParse({
+            password:e
+        })
+        if(!eCheck.success) {
+            console.log("password req fail")
+        }else{
+            password.current=e;
+        }
     }
     const handelPhoneChange=(e:string)=>{
-        number.current=e;
+        const eCheck=PhoneSchema.safeParse({
+            phone:e
+        })
+        if(!eCheck.success) {
+            console.log("phone req fail")
+        }else{
+                number.current=e;
+           }
     }
     const handelNameChange=(e:string)=>{
-        name.current=e;
+       const eCheck=NameSchema.safeParse({
+            name:e
+        })
+        if(!eCheck.success) {
+            console.log("name req fail")
+        }else{
+            name.current=e;
+        }
+               
+    } 
+    const handelEmailChange=(e:string)=>{
+        const eCheck=EmailSchema.safeParse({
+            name:e
+        })
+        if(!eCheck.success) {
+            console.log("email req fail")
+        }else{
+            email.current=e;
+        }
     }
     const handelOtpChange=(e:string)=>{
         otp.current=e;
     }
     const handelSubmit=async ()=>{
         if(otp.current="2004"){
+             setRequiredError({
+            passReq:true,
+            phoneReq:false,
+            nameReq:false,
+            emailReq:false
+           })
+            if (!number.current || !password.current || !name.current || !email.current) {
+      setRequiredError({
+        phoneReq: number.current ? false : true,
+        passReq: password.current ? false : true,
+        nameReq: name.current ? false : true,
+        emailReq: email.current ? false : true,
+       });
+         return ; //########
+         }
        const check=await CreateUser(name.current,email.current,number.current,password.current)
        if(check){
         const res=await signIn('credentials',{
@@ -52,9 +97,7 @@ export function SignUpCard(){
         }
        }}
     }
-    const handelEmailChange=(e:string)=>{
-        email.current=e;
-    }
+   
     
     return <div className="flex justify-center min-h-screen pt-16 bg-slate-400">
     <div className="w-full  max-w-md ">
