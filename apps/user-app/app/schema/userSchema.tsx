@@ -22,3 +22,9 @@ export const NameSchema=z.object({
      name:z.string().min(3,"too short").trim()
           .regex(/^[A-Za-z]+(?: [A-Za-z]+)+$/,{message:"Enter valid Full name"})
 })
+export const otpSchema=z.object({
+     otp:z.string().min(4,"too short").max(4,"too long")
+     .regex(/^[0-9]+$/, "Enter a valid otp")
+     .transform(Number)
+     .refine(v=>v=2004,"Incorrect Otp")
+})

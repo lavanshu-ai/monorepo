@@ -7,7 +7,7 @@ import CreateUser from "../app/lib/actions/createUser";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-import { PhoneSchema,EmailSchema,NameSchema,PasswordSchema } from "../app/schema/userSchema";
+import { PhoneSchema,EmailSchema,NameSchema,PasswordSchema,otpSchema} from "../app/schema/userSchema";
 
 export function SignUpCard(){
     const router=useRouter();
@@ -16,97 +16,95 @@ export function SignUpCard(){
     const password=useRef("")
     const email=useRef("")
     const otp=useRef("")
-     let [RequiredError,setRequiredError]=useState(
-            {   nameReq:false,
-                phoneReq:false,
-                passReq:false,
-                emailReq:false
-
-            }
-        )
+     let [RequiredError,setRequiredError]=useState<Partial<Record<"phone" |"password" |"email"|"name" | "otp",string>>>({})
     const handelPasswordChange=(e:string)=>{
-       const eCheck=PasswordSchema.safeParse({
-            password:e
-        })
-        if(!eCheck.success) {
-            console.log("password req fail")
-        }else{
             password.current=e;
-        }
     }
     const handelPhoneChange=(e:string)=>{
-        const eCheck=PhoneSchema.safeParse({
-            phone:e
-        })
-        if(!eCheck.success) {
-            console.log("phone req fail")
-        }else{
-                number.current=e;
-           }
+            number.current=e;  
     }
     const handelNameChange=(e:string)=>{
-       const eCheck=NameSchema.safeParse({
-            name:e
-        })
-        if(!eCheck.success) {
-            console.log("name req fail")
-        }else{
-            name.current=e;
-        }
-               
+            name.current=e;  
     } 
-    const handelEmailChange=(e:string)=>{
-        const eCheck=EmailSchema.safeParse({
-            name:e
-        })
-        if(!eCheck.success) {
-            console.log("email req fail")
-        }else{
+    const handelEmailChange=(e:string)=>{  
             email.current=e;
-        }
     }
     const handelOtpChange=(e:string)=>{
-        otp.current=e;
+            otp.current=e;
     }
+
     const handelSubmit=async ()=>{
-        if(otp.current="2004"){
-             setRequiredError({
-            passReq:true,
-            phoneReq:false,
-            nameReq:false,
-            emailReq:false
-           })
-            if (!number.current || !password.current || !name.current || !email.current) {
-      setRequiredError({
-        phoneReq: number.current ? false : true,
-        passReq: password.current ? false : true,
-        nameReq: name.current ? false : true,
-        emailReq: email.current ? false : true,
-       });
-         return ; //########
-         }
+        const fieldserror:Record<string,string>={};
+         const eCheck=EmailSchema.safeParse({
+            email:email.current
+         })  
+         if(!eCheck.success){
+               eCheck.error.issues.forEach((issue)=>{
+                const field=issue.path[0] as string
+                fieldserror[field]=issue.message
+            })
+         }   
+         const nCheck=NameSchema.safeParse({
+            name:name.current
+         })
+         if(!nCheck.success){
+               nCheck.error.issues.forEach((issue)=>{
+                const field=issue.path[0] as string
+                fieldserror[field]=issue.message
+            })
+        }
+         const phCheck=PhoneSchema.safeParse({
+            phone:number.current
+         })
+          if(!phCheck.success){
+               phCheck.error.issues.forEach((issue)=>{
+                const field=issue.path[0] as string
+                fieldserror[field]=issue.message
+            })
+        }
+         const pCheck=PasswordSchema.safeParse({
+            password:password.current
+         })
+          if(!pCheck.success){
+               pCheck.error.issues.forEach((issue)=>{
+                const field=issue.path[0] as string
+                fieldserror[field]=issue.message
+            })
+          } 
+          const oCheck=otpSchema.safeParse({
+            otp:otp.current
+          })
+          if(!oCheck.success){
+               oCheck.error.issues.forEach((issue)=>{
+                const field=issue.path[0] as string
+                fieldserror[field]=issue.message
+            })
+          }
+    if(pCheck.success && nCheck.success && phCheck.success && eCheck.success && oCheck.success){
        const check=await CreateUser(name.current,email.current,number.current,password.current)
-       if(check){
-        const res=await signIn('credentials',{
+          if(check){
+            const res=await signIn('credentials',{
             phone:number.current,
             password:password.current,
             redirect:false
-        })
-        if(!res?.error){
-            router.push('/dashboard')
-        }
-       }}
+            })
+                if(!res?.error){
+                  router.push('/dashboard')
+                }
+            }
+       }
+       setRequiredError(fieldserror)
     }
    
     
     return <div className="flex justify-center min-h-screen pt-16 bg-slate-400">
     <div className="w-full  max-w-md ">
         <Card title="Create Account">
-        <Textinput placeholder="name" label="Full Name" onChange={(e)=>handelNameChange(e)} />
-        <Textinput placeholder="0123456789" label="Phone no." onChange={(e)=>handelPhoneChange(e)} />
-        <Textinput placeholder="********" label="Set password" onChange={(e)=>handelPasswordChange(e)} />
-        <Textinput placeholder="eg-xyz@gmail.com" label="Email" onChange={(e)=>{handelEmailChange(e)}} />
-        <Textinput placeholder="4-digit" label="OTP" onChange={(e)=>{handelOtpChange(e)}} />
+        <Textinput placeholder="name" label="Full Name" error={RequiredError.name} onChange={(e)=>handelNameChange(e)} />
+        <Textinput placeholder="0123456789" label="Phone no." error={RequiredError.phone} onChange={(e)=>handelPhoneChange(e)} />
+        <Textinput placeholder="********" label="Set password" error={RequiredError.password} onChange={(e)=>handelPasswordChange(e)} />
+        <Textinput placeholder="eg-xyz@gmail.com" label="Email" error={RequiredError.email} onChange={(e)=>{handelEmailChange(e)}} />
+        <Textinput placeholder="4-digit" label="OTP" error={RequiredError.otp} onChange={(e)=>{handelOtpChange(e)}} />
          <div className="flex justify-center pt-3">
             <Button onClick={()=>{
                 handelSubmit()
@@ -116,9 +114,6 @@ export function SignUpCard(){
 
         }}> Verify Phone No.</Button>
         </div>
-        <Textinput placeholder="eg-xyz@gmail.com" label="Email" onChange={()=>{
-
-        }} />
         <div className="flex justify-center pt-3">
             <Button onClick={()=>{
 

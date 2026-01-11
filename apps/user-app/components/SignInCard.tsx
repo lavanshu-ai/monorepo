@@ -9,40 +9,26 @@ import { PhoneSchema } from "../app/schema/userSchema";
 
 export const SignInCard=()=>{
     const router =useRouter();
-    let [RequiredError,setRequiredError]=useState(
-        {
-            phoneReq:false,
-            passReq:false
-        }
-    )
+    const [RequiredError,setRequiredError]=useState('')
     const phone=useRef("")
     const password=useRef("")
+
     const handelPhoneChange = (e: string)=>{
-        const phoneCheck=PhoneSchema.safeParse({
-            phone:e
-        })
-        if(!phoneCheck.success) {
-            console.log("phone req fail")
-        //    setRequiredError({
-        //     passReq:false,
-        //     phoneReq:true
-        //    })
-        }else{
-                phone.current=e;
-           }
+              phone.current=e;    
       }
     const handelPasswordChange=(p: string)=>{
         password.current=p
     }
     const handelSubmit=async (e?: React.FormEvent<HTMLButtonElement>)=>{
          if(e) e.preventDefault() ;
-         if (!phone.current || !password.current) {
-      setRequiredError({
-        phoneReq: phone.current ? false : true,
-        passReq: password.current ? false : true,
-       });
-         return ; //########
-         }
+        const phoneCheck=PhoneSchema.safeParse({
+            phone:phone.current
+        })
+         if(!phoneCheck.success) {
+           phoneCheck.error.issues.forEach((issue)=>{
+            setRequiredError(issue.message)
+           })
+        }else{
         const res=await signIn('credentials',{
             phone:phone.current,
             password:password.current,
@@ -50,14 +36,14 @@ export const SignInCard=()=>{
         })
         if(!res?.error){
             router.push('/dashboard')
-        }
+        }}
      
      }
     return <div className="flex justify-center pt-24 min-h-screen bg-slate-400">
            <div className="w-full max-w-sm">
          <Card title="Sign In"  >
         <div className="">
-            <Textinput label="Phone no." placeholder="0123456789" onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
+            <Textinput label="Phone no." placeholder="0123456789" error={RequiredError} onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
            <div>
             <Textinput label="Password" placeholder="********" onChange={(p)=>{handelPasswordChange(p)}}></Textinput></div> 
        

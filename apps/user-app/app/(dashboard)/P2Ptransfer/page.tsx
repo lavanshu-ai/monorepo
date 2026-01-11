@@ -7,7 +7,11 @@ export default async function (){
    if(!session){
         redirect('/signIn')
       }
-    return (<div className="min-h-screen w-screen grid place-items-center"> 
-            <P2pcard/>
-          </div>)
+    return ( <div className="pt-32 w-full">
+      <div className="flex justify-center">
+        <div className="w-full max-w-xl px-6">
+          <P2pcard />
+        </div>
+      </div>
+    </div>)
 }
