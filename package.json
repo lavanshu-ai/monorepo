@@ -23,7 +23,6 @@
   ],
   "dependencies": {
     "@prisma/client": "5.22.0",
-    "prisma": "5.22.0",
     "twilio": "^5.11.2",
     "zod": "^4.3.5"
   }
