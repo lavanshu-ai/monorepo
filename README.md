@@ -1,135 +1,182 @@
-# Turborepo starter
+# Mudra – Digital E‑Wallet
 
-This Turborepo starter is maintained by the Turborepo core team.
+Mudra is a **digital wallet** that supports **peer‑to‑peer (P2P) transfers** and **bank‑to‑wallet transfers**, built with a **production‑grade monorepo** setup. The system is designed with  data consistency, secure authentication, and  separation between frontend, backend, and shared packages.
 
-## Using this example
+---
 
-Run the following command:
+## Core Features
 
-```sh
-npx create-turbo@latest
-```
+* Peer‑to‑Peer (P2P) wallet transfers
+* Bank‑to‑Wallet balance loading
+*  Authentication with NextAuth
+*  Transaction history & balance tracking
+*  Atomic, consistent transfers
+* Monorepo architecture using Turborepo
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Tech Stack
 
-### Apps and Packages
+### Frontend
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+* Next.js (App Router)
+* TypeScript
+* Tailwind CSS
+* NextAuth (Credentials / OAuth ready)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Backend
 
-### Utilities
+* Node.js
+* TypeScript
+* PostgreSQL
+* Prisma ORM
+* Zod (request & schema validation)
+* REST APIs for wallet & bank operations
 
-This Turborepo has some additional tools already setup for you:
+### Monorepo Tooling
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+* Turborepo
+* pnpm
+* Shared ESLint & TypeScript configs
 
-### Build
+---
 
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Repository Structure
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+.
+├── apps/
+│   ├── user_app/            # Next.js frontend (wallet UI)
+│   ├── merchant_app/        # Merchant / admin backend APIs
+│   └── bank_webhook/        # Dummy bank server (onramp success callbacks)
+│
+├── packages/
+│   ├── db/                 # Prisma schema & client
+│   ├── ui/                 # Shared UI components (Tailwind)
+│   ├── types/              # Shared TypeScript types
+│   ├── eslint-config/      # Shared ESLint config
+│   └── tsconfig/           # Shared TS configs
+│
+├── turbo.json
+├── package.json
+├── pnpm-workspace.yaml
+└── README.md
 ```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Authentication Flow (NextAuth)
+
+1. User signs up / signs in via NextAuth.
+2. A wallet is created automatically on first signup.
+3. User sessions are validated on both frontend and backend.
+4. All transfer APIs require an authenticated session.
+
+Sessions are treated as the **single source of identity**.
+
+---
+
+## Wallet & Transfer Model
+
+### Wallet
+
+- One wallet per user
+- Balance stored as an integer (smallest currency unit)
+
+### Transfers
+
+#### P2P Transfer
+
+- Sender → Receiver wallet
+- Balance updated atomically inside a DB transaction
+
+#### Bank → Wallet Transfer
+
+- Handled via a **dummy bank webhook server**
+- Bank server accepts:
+  - `token`
+  - `amount`
+  - `user_identifier`
+- Valid requests are immediately marked as **SUCCESS**
+- A successful callback creates an `OnrampTransaction`
+- Wallet balance is updated atomically
+
+All transfers are **ACID‑safe** using PostgreSQL transactions.
+
+---
+
+## Database Design (High Level)
+
+- `User`
+  - Authentication identity (NextAuth)
+
+- `Balance`
+  - One row per user
+  - Stores current wallet balance (integer, smallest unit)
+
+- `OnrampTransaction`
+  - Bank → Wallet credits
+  - Tracks amount, status (PENDING / SUCCESS / FAILED)
+  - Source of truth for external money entering the system
+
+- `P2PTransfer`
+  - Wallet → Wallet transfers
+  - Sender, receiver, amount
+  - Executed atomically with balance updates
+
+Every balance change is driven by either an **OnrampTransaction** or a **P2PTransfer**. Direct balance mutations are not allowed.
+
+---
+
+## Local Development
+
+### Install Dependencies
+
+## Environment Variables
+
+### Frontend (`apps/web/.env`)
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+NEXTAUTH_SECRET=your_secret
+NEXTAUTH_URL=http://localhost:3000
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### Backend (`apps/api-backend/.env`)
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+DATABASE_URL=postgresql://user:password@localhost:5432/mudra
 ```
 
-### Remote Caching
+---
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## Design Principles
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+* **Money is never updated without a transaction**
+* **All balance changes are atomic**
+* **Zod-enforced runtime validation at all boundaries**
+* **Shared types between frontend and backend**
+* **Clear separation of auth, wallet, and transfer logic****
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+---
 
-```
-cd my-turborepo
+## Limitations (Intentional)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+* No real bank integration (mocked / simulated)
+* No multi‑currency support
+* No scheduled payments
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+---
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Future Improvements
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+* Real bank integrations
+* Webhook‑based payment confirmations
+* Multi‑currency wallets
+* Rate limiting & fraud detection
+* Admin dashboard
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+## License
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Lavanshu-ai
