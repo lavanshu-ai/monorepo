@@ -6,7 +6,7 @@ import { prisma } from "@repo/db";
 
 export default async function OnRampTransaction(amount:Number,provider:string){
      const session= await getServerSession(authOptions);
-     const token= (Math.random()).toString();
+     const token= crypto.randomUUID();
      const userId=session?.user.id;
      if(!userId){
         return{

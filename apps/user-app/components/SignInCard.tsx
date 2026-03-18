@@ -10,6 +10,7 @@ import { PhoneSchema } from "../app/schema/userSchema";
 export const SignInCard=()=>{
     const router =useRouter();
     const [RequiredError,setRequiredError]=useState('')
+    const [pass_RequiredError,setPass_RequiredError]=useState('')
     const phone=useRef("")
     const password=useRef("")
 
@@ -34,9 +35,14 @@ export const SignInCard=()=>{
             password:password.current,
             redirect:false
         })
+        console.log(res)
         if(!res?.error){
             router.push('/dashboard')
-        }}
+        }
+        else{
+            setPass_RequiredError('incorrect password')
+        }
+    }
      
      }
     return <div className="flex justify-center pt-24 min-h-screen bg-slate-400">
@@ -45,7 +51,7 @@ export const SignInCard=()=>{
         <div className="">
             <Textinput label="Phone no." placeholder="0123456789" error={RequiredError} onChange={(e)=>handelPhoneChange(e)}></Textinput> </div>
            <div>
-            <Textinput label="Password" placeholder="********" onChange={(p)=>{handelPasswordChange(p)}}></Textinput></div> 
+            <Textinput label="Password" placeholder="********" error={pass_RequiredError}  onChange={(p)=>{handelPasswordChange(p)}}></Textinput></div> 
        
         <div className="flex justify-center pt-4">
             <Button onClick={()=>handelSubmit()
